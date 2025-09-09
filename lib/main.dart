@@ -1,0 +1,895 @@
+import 'package:filmstock/app_settings.dart';
+import 'package:flutter/material.dart';
+
+ThemeData buildTheme(Color primary, Brightness brightness) {
+  return ThemeData(
+    brightness: brightness,
+    scaffoldBackgroundColor: brightness == Brightness.dark
+        ? const Color.fromARGB(255, 50, 50, 50)
+        : Colors.white,
+    primaryColor: primary,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: primary,
+      brightness: brightness,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: brightness == Brightness.dark
+          ? const Color.fromARGB(255, 50, 50, 50)
+          : Colors.white,
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      titleTextStyle: TextStyle(
+        color: brightness == Brightness.dark ? Colors.white : Colors.black,
+        fontSize: 24,
+      ),
+      iconTheme: IconThemeData(
+        color: brightness == Brightness.dark ? Colors.white : Colors.black,
+      ),
+    ),
+    textTheme: TextTheme(
+      titleMedium: TextStyle(
+        color: brightness == Brightness.dark ? Colors.white : Colors.black,
+      ),
+      bodyMedium: TextStyle(
+        color: brightness == Brightness.dark ? Colors.white : Colors.black,
+      ),
+      bodySmall: TextStyle(
+        color: brightness == Brightness.dark ? Colors.white70 : Colors.black87,
+      ),
+    ),
+    dividerColor: primary, // Divider always matches primary color
+    iconTheme: IconThemeData(color: primary),
+    cardColor: brightness == Brightness.dark
+        ? const Color.fromARGB(255, 60, 60, 60)
+        : Colors.white,
+  );
+}
+
+final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
+final ValueNotifier<Color> accentColorNotifier = ValueNotifier(Colors.blue);
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: accentColorNotifier,
+      builder: (context, primary, _) {
+        return ValueListenableBuilder(
+          valueListenable: themeNotifier,
+          builder: (context, mode, _) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: buildTheme(primary, Brightness.light),
+              darkTheme: buildTheme(primary, Brightness.dark),
+              themeMode: mode,
+              home: MyHomePage(title: 'home page'),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key, required this.title});
+
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final CarouselController controller = CarouselController(initialItem: 2);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final scaffoldBg = theme.scaffoldBackgroundColor;
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+    final primary = colorScheme.primary;
+    //final cardColor = theme.cardColor;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Film Stock',
+          style: TextStyle(
+            color: theme.appBarTheme.titleTextStyle?.color ?? textColor,
+          ),
+        ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              print('Pressed');
+            },
+            icon: Icon(
+              Icons.search,
+              color: theme.appBarTheme.iconTheme?.color ?? textColor,
+            ),
+          ),
+        ],
+      ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            Flexible(
+              flex: 1,
+              child: Container(
+                alignment: Alignment.topLeft,
+                padding: EdgeInsets.only(left: 16, top: 60),
+                decoration: BoxDecoration(color: scaffoldBg),
+                child: Text(
+                  'FilmStock',
+                  style: TextStyle(fontSize: 40, color: textColor),
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 5,
+              child: Container(
+                alignment: Alignment.topLeft,
+                decoration: BoxDecoration(color: scaffoldBg),
+                child: ListView(
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(height: 50),
+                    Material(
+                      color: scaffoldBg,
+                      child: ListTile(
+                        title: Text(
+                          '<user>',
+                          style: TextStyle(fontSize: 30, color: textColor),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        leading: Icon(Icons.person, color: primary),
+                        onTap: () {
+                          print('pressed');
+                        },
+                      ),
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ExpansionTile(
+                        title: Text(
+                          'Discover',
+                          style: TextStyle(fontSize: 25, color: textColor),
+                        ),
+                        leading: Icon(Icons.search, color: primary),
+                        trailing: SizedBox.shrink(),
+                        children: [
+                          ExpandedListTile(
+                            title: 'Movies & Shows',
+                            onTap: () {
+                              print('pressed');
+                            },
+                          ),
+                          ExpandedListTile(
+                            title: 'Songs',
+                            onTap: () {
+                              print('pressed');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ExpansionTile(
+                        title: Text(
+                          'Lists',
+                          style: TextStyle(fontSize: 25, color: textColor),
+                        ),
+                        leading: Icon(Icons.list, color: primary),
+                        trailing: SizedBox.shrink(),
+                        children: [
+                          ExpandedListTile(
+                            title: 'Movie & Show Lists',
+                            onTap: () {
+                              print('pressed');
+                            },
+                          ),
+                          ExpandedListTile(
+                            title: 'Playlists',
+                            onTap: () {
+                              print('pressed');
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ListTile(
+                        title: Text(
+                          'Friends',
+                          style: TextStyle(fontSize: 25, color: textColor),
+                        ),
+                        leading: Icon(Icons.person_add, color: primary),
+                        onTap: () {
+                          print('pressed');
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 2,
+              child: Container(
+                color: scaffoldBg,
+                alignment: Alignment.topLeft,
+                child: ListView(
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    Divider(
+                      height: 1,
+                      thickness: 2,
+                      indent: 20,
+                      endIndent: 100,
+                      color: theme.dividerColor, // uses theme divider
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ListTile(
+                        title: Text(
+                          'App Settings',
+                          style: TextStyle(fontSize: 15, color: textColor),
+                        ),
+                        leading: Icon(Icons.settings, color: primary),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MyAppSettings(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ListTile(
+                        title: Text(
+                          'Help & Feedback',
+                          style: TextStyle(fontSize: 15, color: textColor),
+                        ),
+                        leading: Icon(Icons.help, color: primary),
+                        onTap: () {
+                          print('pressed');
+                        },
+                      ),
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ListTile(
+                        title: Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: colorScheme.error,
+                          ),
+                        ),
+                        leading: Icon(Icons.logout, color: colorScheme.error),
+                        onTap: () {
+                          print('pressed');
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: primary),
+          borderRadius: BorderRadius.circular(15),
+          color: primary,
+        ),
+        child: FloatingActionButton(
+          onPressed: () {
+            print('Pressed');
+          },
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          backgroundColor: primary, // primary color
+          foregroundColor: textColor, // theme text color
+          child: Icon(Icons.add, size: 30, color: textColor),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Flexible(
+              flex: 9,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: CarouselView(
+                  controller: controller,
+                  itemSnapping: true,
+                  itemExtent: double.infinity,
+                  children: List<Widget>.generate(4, (int index) {
+                    return ColoredBox(
+                      color: primary.withOpacity(
+                        0.3 + 0.2 * index,
+                      ), // themed color
+                    );
+                  }),
+                ),
+              ),
+            ),
+            Divider(
+              height: 20,
+              thickness: 2,
+              indent: 20,
+              endIndent: 20,
+              color: theme.dividerColor,
+            ),
+            Flexible(
+              flex: 2,
+              child: AspectRatio(
+                aspectRatio: 10 / 1,
+                child: HomePageHeader(
+                  title: 'Discover by Genre',
+                  onTap: () {
+                    print('Pressed');
+                  },
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 5,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final containerHeight = constraints.maxHeight * 0.6;
+                  return ListView(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.only(bottom: 18),
+                    children: [
+                      SizedBox(width: 10),
+                      HomePageGenreCard(
+                        name: 'Action',
+                        color: primary, // themed color
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: containerHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageGenreCard(
+                        name: 'Drama',
+                        color: primary.withBlue(200), // themed color
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: containerHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageGenreCard(
+                        name: 'Comedy',
+                        color: colorScheme.secondary, // themed color
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: containerHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageGenreCard(
+                        name: 'Horror',
+                        color: primary.withRed(150), // themed color
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: containerHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageGenreCard(
+                        name: 'Sci-Fi',
+                        color: primary.withGreen(200), // themed color
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: containerHeight,
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Divider(
+              height: 20,
+              thickness: 2,
+              indent: 20,
+              endIndent: 20,
+              color: theme.dividerColor,
+            ),
+            Flexible(
+              flex: 2,
+              child: AspectRatio(
+                aspectRatio: 10 / 1,
+                child: HomePageHeader(
+                  title: 'Friend Activity',
+                  onTap: () {
+                    print('Pressed');
+                  },
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 4,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardHeight = constraints.maxHeight * 0.95;
+                  return ListView(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.only(bottom: 12),
+                    clipBehavior: Clip.none,
+                    children: [
+                      SizedBox(width: 10),
+                      HomePageFriendCard(
+                        username: 'user1',
+                        content: 'interstellar',
+                        rating: 8,
+                        comment: 'test',
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: cardHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageFriendCard(
+                        username: 'user2',
+                        content: 'inception',
+                        rating: 9,
+                        comment: 'amazing visuals i loved it',
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: cardHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageFriendCard(
+                        username: "user3",
+                        content: 'arrival',
+                        rating: 10,
+                        comment:
+                            "amy adams played one of the best preformances ive ever seen",
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: cardHeight,
+                      ),
+                      SizedBox(width: 10),
+                      HomePageFriendCard(
+                        username: 'user4',
+                        content: 'the dead poets scoiety',
+                        rating: 10,
+                        comment: 'best movie ive ever seen',
+                        onTap: () {
+                          print('Pressed');
+                        },
+                        height: cardHeight,
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Divider(
+              height: 20,
+              thickness: 2,
+              indent: 20,
+              endIndent: 20,
+              color: theme.dividerColor,
+            ),
+            Flexible(
+              flex: 2,
+              child: AspectRatio(
+                aspectRatio: 10 / 1,
+                child: HomePageHeader(
+                  title: 'Your Recent Activity',
+                  onTap: () {
+                    print('Pressed');
+                  },
+                ),
+              ),
+            ),
+            Flexible(
+              flex: 4,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final cardHeight = constraints.maxHeight * .95;
+                  return ListView(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    padding: EdgeInsets.only(bottom: 12),
+                    clipBehavior: Clip.none,
+                    children: [
+                      SizedBox(width: 10),
+                      HomePageRecentActivity(
+                        content: 'The Prestige',
+                        rating: 7,
+                        comment: 'one of the bbest twists ever!!',
+                        height: cardHeight,
+                        onTap: () {
+                          print('Pressed');
+                        },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            Expanded(child: Container()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+//Used to make titles for sections on the home page
+class HomePageHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onTap;
+
+  const HomePageHeader({super.key, required this.title, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+    return InkWell(
+      onTap: onTap,
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 10,
+            top: 0,
+            bottom: 0,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Icon(Icons.arrow_forward_ios, size: 20, color: textColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+//Used to make cards for the Discover by genre Section
+class HomePageGenreCard extends StatelessWidget {
+  final String name;
+  final Color color;
+  final VoidCallback? onTap;
+  final double height;
+
+  const HomePageGenreCard({
+    super.key,
+    required this.name,
+    required this.color,
+    required this.onTap,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+    return Material(
+      color: color,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          width: 160,
+          height: height,
+          padding: EdgeInsets.all(8),
+          child: Center(
+            child: Text(
+              name,
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//Used to make cards for the friend activity section
+class HomePageFriendCard extends StatelessWidget {
+  final String username;
+  final String content;
+  final double rating;
+  final String comment;
+  final VoidCallback? onTap;
+  final double height;
+
+  const HomePageFriendCard({
+    super.key,
+    required this.username,
+    required this.content,
+    required this.rating,
+    required this.comment,
+    required this.onTap,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+    final primary = theme.colorScheme.primary;
+    final cardColor = theme.cardColor;
+    return Material(
+      color: cardColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: primary),
+          ),
+          width: 200,
+          height: height,
+          padding: EdgeInsets.all(8),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        username,
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: textColor,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: EdgeInsets.only(right: 48),
+                        child: Text(
+                          content,
+                          style: TextStyle(color: textColor, fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Text(
+                        '$rating/10',
+                        style: TextStyle(color: textColor, fontSize: 14),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(
+                  height: 6,
+                  thickness: 1,
+                  indent: 0,
+                  endIndent: 0,
+                  color: primary,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    comment,
+                    style: TextStyle(color: textColor, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//used to make cards for the recent activity section
+class HomePageRecentActivity extends StatelessWidget {
+  final String content;
+  final double rating;
+  final String comment;
+  final double height;
+  final VoidCallback? onTap;
+
+  const HomePageRecentActivity({
+    super.key,
+    required this.content,
+    required this.rating,
+    required this.comment,
+    required this.height,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+    final primary = theme.colorScheme.primary;
+    final cardColor = theme.cardColor;
+    return Material(
+      color: cardColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: cardColor,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: primary),
+          ),
+          width: 200,
+          height: height,
+          padding: EdgeInsets.all(8),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        content,
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: textColor,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 6),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: EdgeInsets.only(right: 48),
+                        child: Text(
+                          '$rating/10',
+                          style: TextStyle(color: textColor, fontSize: 14),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(
+                  height: 6,
+                  thickness: 1,
+                  indent: 0,
+                  endIndent: 0,
+                  color: primary,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    comment,
+                    style: TextStyle(color: textColor, fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ExpandedListTile extends StatelessWidget {
+  final String title;
+  final VoidCallback? onTap;
+
+  const ExpandedListTile({super.key, required this.title, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scaffoldBg = theme.scaffoldBackgroundColor;
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+
+    return ListTile(
+      tileColor: scaffoldBg,
+      leading: Container(width: 16, height: 2, color: theme.dividerColor),
+      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      title: Text(title, style: TextStyle(color: textColor)),
+      onTap: onTap,
+    );
+  }
+}
+
+// Apply similar changes to HomePageFriendCard, HomePageRecentActivity, etc.
+// Use Theme.of(context) for colors instead of hardcoded values.
