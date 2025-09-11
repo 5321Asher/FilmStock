@@ -55,10 +55,7 @@ class MyAppSettings extends StatelessWidget {
                       padding: EdgeInsets.only(left: 25),
                       child: Text(
                         'Color Theme',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: textColor,
-                        ),
+                        style: TextStyle(fontSize: 20, color: textColor),
                       ),
                     ),
                     SizedBox(width: 200),

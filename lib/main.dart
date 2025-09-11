@@ -87,7 +87,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -95,6 +94,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final scaffoldBg = theme.scaffoldBackgroundColor;
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
     final primary = colorScheme.primary;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     //final cardColor = theme.cardColor;
 
     return Scaffold(
@@ -107,9 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              print('Pressed');
-            },
+            onPressed: () {},
             icon: Icon(
               Icons.search,
               color: theme.appBarTheme.iconTheme?.color ?? textColor,
@@ -151,9 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         leading: Icon(Icons.person, color: primary),
-                        onTap: () {
-                          print('pressed');
-                        },
+                        onTap: () {},
                       ),
                     ),
                     Material(
@@ -168,16 +165,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           ExpandedListTile(
                             title: 'Movies & Shows',
-                            onTap: () {
-                              print('pressed');
-                            },
+                            onTap: () {},
                           ),
-                          ExpandedListTile(
-                            title: 'Songs',
-                            onTap: () {
-                              print('pressed');
-                            },
-                          ),
+                          ExpandedListTile(title: 'Songs', onTap: () {}),
                         ],
                       ),
                     ),
@@ -193,16 +183,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         children: [
                           ExpandedListTile(
                             title: 'Movie & Show Lists',
-                            onTap: () {
-                              print('pressed');
-                            },
+                            onTap: () {},
                           ),
-                          ExpandedListTile(
-                            title: 'Playlists',
-                            onTap: () {
-                              print('pressed');
-                            },
-                          ),
+                          ExpandedListTile(title: 'Playlists', onTap: () {}),
                         ],
                       ),
                     ),
@@ -214,9 +197,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: TextStyle(fontSize: 25, color: textColor),
                         ),
                         leading: Icon(Icons.person_add, color: primary),
-                        onTap: () {
-                          print('pressed');
-                        },
+                        onTap: () {},
+                      ),
+                    ),
+                    Material(
+                      color: scaffoldBg,
+                      child: ListTile(
+                        title: Text(
+                          'News',
+                          style: TextStyle(fontSize: 25, color: textColor),
+                        ),
+                        leading: Icon(Icons.newspaper, color: primary),
+                        onTap: () {},
                       ),
                     ),
                   ],
@@ -264,9 +256,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: TextStyle(fontSize: 15, color: textColor),
                         ),
                         leading: Icon(Icons.help, color: primary),
-                        onTap: () {
-                          print('pressed');
-                        },
+                        onTap: () {},
                       ),
                     ),
                     Material(
@@ -280,9 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                         leading: Icon(Icons.logout, color: colorScheme.error),
-                        onTap: () {
-                          print('pressed');
-                        },
+                        onTap: () {},
                       ),
                     ),
                   ],
@@ -299,9 +287,7 @@ class _MyHomePageState extends State<MyHomePage> {
           color: primary,
         ),
         child: FloatingActionButton(
-          onPressed: () {
-            print('Pressed');
-          },
+          onPressed: () {},
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
@@ -314,213 +300,79 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            Divider(
-              height: 20,
-              thickness: 2,
-              indent: 20,
-              endIndent: 20,
-              color: theme.dividerColor,
-            ),
-            Flexible(
-              flex: 2,
-              child: AspectRatio(
-                aspectRatio: 10 / 1,
-                child: HomePageHeader(
-                  title: 'Discover by Genre',
-                  onTap: () {
-                    print('Pressed');
-                  },
+            Center(
+              child: Text(
+                'Welcome <user>',
+                style: TextStyle(
+                  fontSize: 35,
+                  fontWeight: FontWeight.bold,
+                  color: textColor,
                 ),
-              ),
-            ),
-            Flexible(
-              flex: 5,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final containerHeight = constraints.maxHeight * 0.6;
-                  return ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(bottom: 18),
-                    children: [
-                      SizedBox(width: 10),
-                      HomePageGenreCard(
-                        name: 'Action',
-                        color: primary, // themed color
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: containerHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageGenreCard(
-                        name: 'Drama',
-                        color: primary.withBlue(200), // themed color
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: containerHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageGenreCard(
-                        name: 'Comedy',
-                        color: colorScheme.secondary, // themed color
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: containerHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageGenreCard(
-                        name: 'Horror',
-                        color: primary.withRed(150), // themed color
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: containerHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageGenreCard(
-                        name: 'Sci-Fi',
-                        color: primary.withGreen(200), // themed color
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: containerHeight,
-                      ),
-                      SizedBox(width: 10),
-                    ],
-                  );
-                },
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             Divider(
-              height: 20,
-              thickness: 2,
-              indent: 20,
-              endIndent: 20,
+              height: screenHeight * .01,
+              thickness: screenHeight * .003,
+              indent: screenWidth * .05,
+              endIndent: screenWidth * .05,
               color: theme.dividerColor,
             ),
-            Flexible(
-              flex: 2,
-              child: AspectRatio(
-                aspectRatio: 10 / 1,
-                child: HomePageHeader(
-                  title: 'Friend Activity',
-                  onTap: () {
-                    print('Pressed');
-                  },
+            Expanded(
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    HomePageHeader(title: 'Discover New Movies', onTap: () {}),
+                    Divider(
+                      height: 0,
+                      thickness: screenHeight * .003,
+                      indent: screenWidth * .25,
+                      endIndent: screenWidth * .25,
+                      color: theme.dividerColor,
+                    ),
+                    SizedBox(height: screenHeight * .01),
+                    HomePageGenreCard(
+                      name: 'asher',
+                      color: Colors.red,
+                      onTap: () {},
+                    ),
+                    HomePageHeader(title: 'Friend Activity', onTap: () {}),
+                    Divider(
+                      height: 0,
+                      thickness: screenHeight * .003,
+                      indent: screenWidth * .25,
+                      endIndent: screenWidth * .25,
+                      color: theme.dividerColor,
+                    ),
+                    SizedBox(height: screenHeight * .01),
+                    HomePageFriendCard(
+                      username: 'user',
+                      content: 'interstellar',
+                      rating: 9,
+                      comment: "great stuff",
+                      onTap: () {},
+                    ),
+                    HomePageHeader(title: 'Your Recent Activity', onTap: () {}),
+                    Divider(
+                      height: 0,
+                      thickness: screenHeight * .003,
+                      indent: screenWidth * .25,
+                      endIndent: screenWidth * .25,
+                      color: theme.dividerColor,
+                    ),
+                    HomePageRecentActivity(
+                      content: 'interstellar',
+                      rating: 9.5,
+                      comment: 'fantastic stuf',
+                      onTap: () {},
+                    ),
+                    SizedBox(height: screenHeight * .1),
+                  ],
                 ),
               ),
             ),
-            Flexible(
-              flex: 4,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final cardHeight = constraints.maxHeight * 0.95;
-                  return ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.only(bottom: 12),
-                    clipBehavior: Clip.none,
-                    children: [
-                      SizedBox(width: 10),
-                      HomePageFriendCard(
-                        username: 'user1',
-                        content: 'interstellar',
-                        rating: 8,
-                        comment: 'test',
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: cardHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageFriendCard(
-                        username: 'user2',
-                        content: 'inception',
-                        rating: 9,
-                        comment: 'amazing visuals i loved it',
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: cardHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageFriendCard(
-                        username: "user3",
-                        content: 'arrival',
-                        rating: 10,
-                        comment:
-                            "amy adams played one of the best preformances ive ever seen",
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: cardHeight,
-                      ),
-                      SizedBox(width: 10),
-                      HomePageFriendCard(
-                        username: 'user4',
-                        content: 'the dead poets scoiety',
-                        rating: 10,
-                        comment: 'best movie ive ever seen',
-                        onTap: () {
-                          print('Pressed');
-                        },
-                        height: cardHeight,
-                      ),
-                      SizedBox(width: 10),
-                    ],
-                  );
-                },
-              ),
-            ),
-            Divider(
-              height: 20,
-              thickness: 2,
-              indent: 20,
-              endIndent: 20,
-              color: theme.dividerColor,
-            ),
-            Flexible(
-              flex: 2,
-              child: AspectRatio(
-                aspectRatio: 10 / 1,
-                child: HomePageHeader(
-                  title: 'Your Recent Activity',
-                  onTap: () {
-                    print('Pressed');
-                  },
-                ),
-              ),
-            ),
-            Flexible(
-              flex: 4,
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final cardHeight = constraints.maxHeight * .95;
-                  return ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-                    padding: EdgeInsets.only(bottom: 12),
-                    clipBehavior: Clip.none,
-                    children: [
-                      SizedBox(width: 10),
-                      HomePageRecentActivity(
-                        content: 'The Prestige',
-                        rating: 7,
-                        comment: 'one of the bbest twists ever!!',
-                        height: cardHeight,
-                        onTap: () {
-                          print('Pressed');
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-            Expanded(child: Container()),
           ],
         ),
       ),
@@ -528,7 +380,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-//Used to make titles for sections on the home page
 class HomePageHeader extends StatelessWidget {
   final String title;
   final VoidCallback? onTap;
@@ -541,46 +392,53 @@ class HomePageHeader extends StatelessWidget {
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
     return InkWell(
       onTap: onTap,
-      child: Stack(
-        children: [
-          Center(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * .01,
+        ),
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                Center(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: MediaQuery.of(context).size.width * .05,
+                  top: 0,
+                  bottom: 0,
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 20,
+                    color: textColor,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Positioned(
-            right: 10,
-            top: 0,
-            bottom: 0,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Icon(Icons.arrow_forward_ios, size: 20, color: textColor),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-//Used to make cards for the Discover by genre Section
 class HomePageGenreCard extends StatelessWidget {
   final String name;
   final Color color;
   final VoidCallback? onTap;
-  final double height;
 
   const HomePageGenreCard({
     super.key,
     required this.name,
     required this.color,
     required this.onTap,
-    required this.height,
   });
 
   @override
@@ -598,9 +456,8 @@ class HomePageGenreCard extends StatelessWidget {
             color: color,
             borderRadius: BorderRadius.circular(8),
           ),
-          width: 160,
-          height: height,
-          padding: EdgeInsets.all(8),
+          width: MediaQuery.of(context).size.width * .35,
+          height: MediaQuery.of(context).size.height * .25,
           child: Center(
             child: Text(
               name,
@@ -617,14 +474,12 @@ class HomePageGenreCard extends StatelessWidget {
   }
 }
 
-//Used to make cards for the friend activity section
 class HomePageFriendCard extends StatelessWidget {
   final String username;
   final String content;
   final double rating;
   final String comment;
   final VoidCallback? onTap;
-  final double height;
 
   const HomePageFriendCard({
     super.key,
@@ -633,7 +488,6 @@ class HomePageFriendCard extends StatelessWidget {
     required this.rating,
     required this.comment,
     required this.onTap,
-    required this.height,
   });
 
   @override
@@ -654,85 +508,69 @@ class HomePageFriendCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: primary),
           ),
-          width: 200,
-          height: height,
+          width: MediaQuery.of(context).size.width * .4,
+          height: MediaQuery.of(context).size.height * .2,
           padding: EdgeInsets.all(8),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        username,
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: textColor,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 6),
-                Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: EdgeInsets.only(right: 48),
-                        child: Text(
-                          content,
-                          style: TextStyle(color: textColor, fontSize: 14),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Text(
-                        '$rating/10',
-                        style: TextStyle(color: textColor, fontSize: 14),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 6,
-                  thickness: 1,
-                  indent: 0,
-                  endIndent: 0,
-                  color: primary,
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    comment,
-                    style: TextStyle(color: textColor, fontSize: 12),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+
+          child: Column(
+            children: [
+              Center(
+                child: Text(
+                  username,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: 6),
+              Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: EdgeInsets.only(right: 48),
+                      child: Text(
+                        content,
+                        style: TextStyle(color: textColor, fontSize: 16),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    bottom: 0,
+                    child: Text(
+                      '$rating/10',
+                      style: TextStyle(color: textColor, fontSize: 14),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              Divider(
+                height: 6,
+                thickness: 1,
+                indent: 0,
+                endIndent: 0,
+                color: primary,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  comment,
+                  style: TextStyle(color: textColor, fontSize: 14),
+                  maxLines: 5,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -740,12 +578,10 @@ class HomePageFriendCard extends StatelessWidget {
   }
 }
 
-//used to make cards for the recent activity section
 class HomePageRecentActivity extends StatelessWidget {
   final String content;
   final double rating;
   final String comment;
-  final double height;
   final VoidCallback? onTap;
 
   const HomePageRecentActivity({
@@ -753,7 +589,6 @@ class HomePageRecentActivity extends StatelessWidget {
     required this.content,
     required this.rating,
     required this.comment,
-    required this.height,
     required this.onTap,
   });
 
@@ -775,74 +610,54 @@ class HomePageRecentActivity extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: primary),
           ),
-          width: 200,
-          height: height,
+          width: MediaQuery.of(context).size.width * .4,
+          height: MediaQuery.of(context).size.height * .15,
           padding: EdgeInsets.all(8),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        content,
-                        style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: textColor,
-                      ),
-                    ),
-                  ],
+          child: Column(
+            children: [
+              Center(
+                child: Text(
+                  content,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 6),
-                Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Container(
-                        padding: EdgeInsets.only(right: 48),
-                        child: Text(
-                          '$rating/10',
-                          style: TextStyle(color: textColor, fontSize: 14),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 6,
-                  thickness: 1,
-                  indent: 0,
-                  endIndent: 0,
-                  color: primary,
-                ),
-                Align(
-                  alignment: Alignment.centerLeft,
+              ),
+              SizedBox(height: 6),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: EdgeInsets.only(right: 48),
                   child: Text(
-                    comment,
-                    style: TextStyle(color: textColor, fontSize: 12),
+                    '$rating/10',
+                    style: TextStyle(color: textColor, fontSize: 16),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ],
-            ),
+              ),
+
+              Divider(
+                height: 6,
+                thickness: 1,
+                indent: 0,
+                endIndent: 0,
+                color: primary,
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  comment,
+                  style: TextStyle(color: textColor, fontSize: 14),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
         ),
       ),
