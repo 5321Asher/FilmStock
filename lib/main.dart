@@ -87,7 +87,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final CarouselController controller = CarouselController(initialItem: 2);
 
   @override
   Widget build(BuildContext context) {
@@ -315,24 +314,6 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            Flexible(
-              flex: 9,
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: CarouselView(
-                  controller: controller,
-                  itemSnapping: true,
-                  itemExtent: double.infinity,
-                  children: List<Widget>.generate(4, (int index) {
-                    return ColoredBox(
-                      color: primary.withOpacity(
-                        0.3 + 0.2 * index,
-                      ), // themed color
-                    );
-                  }),
-                ),
-              ),
-            ),
             Divider(
               height: 20,
               thickness: 2,
@@ -890,6 +871,3 @@ class ExpandedListTile extends StatelessWidget {
     );
   }
 }
-
-// Apply similar changes to HomePageFriendCard, HomePageRecentActivity, etc.
-// Use Theme.of(context) for colors instead of hardcoded values.
