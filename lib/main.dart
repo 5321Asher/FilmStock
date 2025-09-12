@@ -1,5 +1,7 @@
 import 'package:filmstock/app_settings.dart';
+import 'package:filmstock/help_and_feedback.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 ThemeData buildTheme(Color primary, Brightness brightness) {
   return ThemeData(
@@ -48,7 +50,20 @@ ThemeData buildTheme(Color primary, Brightness brightness) {
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
 final ValueNotifier<Color> accentColorNotifier = ValueNotifier(Colors.blue);
 
+class Screen {
+  static double width(BuildContext context) =>
+      MediaQuery.of(context).size.width;
+
+  static double height(BuildContext context) =>
+      MediaQuery.of(context).size.height;
+}
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(MyApp());
 }
 
@@ -83,10 +98,10 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -94,8 +109,6 @@ class _MyHomePageState extends State<MyHomePage> {
     final scaffoldBg = theme.scaffoldBackgroundColor;
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
     final primary = colorScheme.primary;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     //final cardColor = theme.cardColor;
 
     return Scaffold(
@@ -123,7 +136,10 @@ class _MyHomePageState extends State<MyHomePage> {
               flex: 1,
               child: Container(
                 alignment: Alignment.topLeft,
-                padding: EdgeInsets.only(left: 16, top: 60),
+                padding: EdgeInsets.only(
+                  left: Screen.width(context) * .06,
+                  top: Screen.height(context) * .05,
+                ),
                 decoration: BoxDecoration(color: scaffoldBg),
                 child: Text(
                   'FilmStock',
@@ -139,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ListView(
                   physics: NeverScrollableScrollPhysics(),
                   children: [
-                    SizedBox(height: 50),
+                    SizedBox(height: Screen.height(context) * .02),
                     Material(
                       color: scaffoldBg,
                       child: ListTile(
@@ -149,7 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        leading: Icon(Icons.person, color: primary),
+                        leading: Icon(Icons.person, color: primary, size: 30),
                         onTap: () {},
                       ),
                     ),
@@ -225,9 +241,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: [
                     Divider(
                       height: 1,
-                      thickness: 2,
-                      indent: 20,
-                      endIndent: 100,
+                      thickness: Screen.height(context) * .003,
+                      indent: Screen.width(context) * .04,
+                      endIndent: Screen.width(context) * .25,
                       color: theme.dividerColor, // uses theme divider
                     ),
                     Material(
@@ -256,7 +272,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           style: TextStyle(fontSize: 15, color: textColor),
                         ),
                         leading: Icon(Icons.help, color: primary),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HelpAndFeedback(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     Material(
@@ -312,13 +335,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Divider(
-              height: screenHeight * .01,
-              thickness: screenHeight * .003,
-              indent: screenWidth * .05,
-              endIndent: screenWidth * .05,
-              color: theme.dividerColor,
-            ),
             Expanded(
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
@@ -327,12 +343,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     HomePageHeader(title: 'Discover New Movies', onTap: () {}),
                     Divider(
                       height: 0,
-                      thickness: screenHeight * .003,
-                      indent: screenWidth * .25,
-                      endIndent: screenWidth * .25,
+                      thickness: Screen.height(context) * .003,
+                      indent: Screen.width(context) * .25,
+                      endIndent: Screen.width(context) * .25,
                       color: theme.dividerColor,
                     ),
-                    SizedBox(height: screenHeight * .01),
+                    SizedBox(height: Screen.height(context) * .01),
                     HomePageGenreCard(
                       name: 'asher',
                       color: Colors.red,
@@ -341,12 +357,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     HomePageHeader(title: 'Friend Activity', onTap: () {}),
                     Divider(
                       height: 0,
-                      thickness: screenHeight * .003,
-                      indent: screenWidth * .25,
-                      endIndent: screenWidth * .25,
+                      thickness: Screen.height(context) * .003,
+                      indent: Screen.width(context) * .25,
+                      endIndent: Screen.width(context) * .25,
                       color: theme.dividerColor,
                     ),
-                    SizedBox(height: screenHeight * .01),
+                    SizedBox(height: Screen.height(context) * .01),
                     HomePageFriendCard(
                       username: 'user',
                       content: 'interstellar',
@@ -357,18 +373,20 @@ class _MyHomePageState extends State<MyHomePage> {
                     HomePageHeader(title: 'Your Recent Activity', onTap: () {}),
                     Divider(
                       height: 0,
-                      thickness: screenHeight * .003,
-                      indent: screenWidth * .25,
-                      endIndent: screenWidth * .25,
+                      thickness: Screen.height(context) * .003,
+                      indent: Screen.width(context) * .25,
+                      endIndent: Screen.width(context) * .25,
                       color: theme.dividerColor,
                     ),
+                    SizedBox(height: Screen.height(context) * .01),
+
                     HomePageRecentActivity(
                       content: 'interstellar',
                       rating: 9.5,
                       comment: 'fantastic stuf',
                       onTap: () {},
                     ),
-                    SizedBox(height: screenHeight * .1),
+                    SizedBox(height: Screen.height(context) * .1),
                   ],
                 ),
               ),
@@ -393,9 +411,7 @@ class HomePageHeader extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: MediaQuery.of(context).size.height * .01,
-        ),
+        padding: EdgeInsets.symmetric(vertical: Screen.height(context) * .01),
         child: Column(
           children: [
             Stack(
@@ -411,7 +427,7 @@ class HomePageHeader extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: MediaQuery.of(context).size.width * .05,
+                  right: Screen.width(context) * .05,
                   top: 0,
                   bottom: 0,
                   child: Icon(
@@ -456,8 +472,8 @@ class HomePageGenreCard extends StatelessWidget {
             color: color,
             borderRadius: BorderRadius.circular(8),
           ),
-          width: MediaQuery.of(context).size.width * .35,
-          height: MediaQuery.of(context).size.height * .25,
+          width: Screen.width(context) * .35,
+          height: Screen.height(context) * .25,
           child: Center(
             child: Text(
               name,
@@ -508,8 +524,8 @@ class HomePageFriendCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: primary),
           ),
-          width: MediaQuery.of(context).size.width * .4,
-          height: MediaQuery.of(context).size.height * .2,
+          width: Screen.width(context) * .4,
+          height: Screen.height(context) * .2,
           padding: EdgeInsets.all(8),
 
           child: Column(
@@ -610,8 +626,8 @@ class HomePageRecentActivity extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: primary),
           ),
-          width: MediaQuery.of(context).size.width * .4,
-          height: MediaQuery.of(context).size.height * .15,
+          width: Screen.width(context) * .4,
+          height: Screen.height(context) * .15,
           padding: EdgeInsets.all(8),
           child: Column(
             children: [
@@ -679,8 +695,15 @@ class ExpandedListTile extends StatelessWidget {
 
     return ListTile(
       tileColor: scaffoldBg,
-      leading: Container(width: 16, height: 2, color: theme.dividerColor),
-      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      leading: Container(
+        width: Screen.width(context) * .05,
+        height: Screen.height(context) * .002,
+        color: theme.dividerColor,
+      ),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: Screen.width(context) * .06,
+        vertical: 0,
+      ),
       title: Text(title, style: TextStyle(color: textColor)),
       onTap: onTap,
     );

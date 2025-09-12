@@ -11,7 +11,6 @@ class MyAppSettings extends StatelessWidget {
     final scaffoldBg = theme.scaffoldBackgroundColor;
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
     final primary = colorScheme.primary;
-    //final cardColor = theme.cardColor;
     return Scaffold(
       appBar: AppBar(title: Text('App Settings')),
       body: ListView(
@@ -20,19 +19,24 @@ class MyAppSettings extends StatelessWidget {
           Material(
             color: scaffoldBg,
             child: SizedBox(
-              height: 50,
-              child: ListTile(
-                title: Text(
-                  'Dark Mode',
-                  style: TextStyle(fontSize: 20, color: textColor),
+              height: Screen.height(context) * .06,
+              child: Padding(
+                padding: EdgeInsetsGeometry.only(
+                  left: Screen.width(context) * .03,
                 ),
-                trailing: Switch(
-                  value: themeNotifier.value == ThemeMode.dark,
-                  onChanged: (bool value) {
-                    themeNotifier.value = value
-                        ? ThemeMode.dark
-                        : ThemeMode.light;
-                  },
+                child: ListTile(
+                  title: Text(
+                    'Dark Mode',
+                    style: TextStyle(fontSize: 20, color: textColor),
+                  ),
+                  trailing: Switch(
+                    value: themeNotifier.value == ThemeMode.dark,
+                    onChanged: (bool value) {
+                      themeNotifier.value = value
+                          ? ThemeMode.dark
+                          : ThemeMode.light;
+                    },
+                  ),
                 ),
               ),
             ),
@@ -48,21 +52,28 @@ class MyAppSettings extends StatelessWidget {
                 ),
               ),
               child: SizedBox(
-                height: 50,
-                child: Row(
+                height: Screen.height(context) * .06,
+                child: Stack(
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(left: 25),
+                      padding: EdgeInsets.only(
+                        left: Screen.width(context) * .065,
+                        top: Screen.height(context) * .015,
+                      ),
                       child: Text(
                         'Color Theme',
                         style: TextStyle(fontSize: 20, color: textColor),
                       ),
                     ),
-                    SizedBox(width: 200),
-                    Icon(
-                      Icons.arrow_drop_down_circle_sharp,
-                      size: 35,
-                      color: primary,
+                    Positioned(
+                      right: Screen.width(context) * .085,
+                      top: 0,
+                      bottom: 0,
+                      child: Icon(
+                        Icons.arrow_drop_down_circle_sharp,
+                        size: 35,
+                        color: primary,
+                      ),
                     ),
                   ],
                 ),
@@ -70,34 +81,43 @@ class MyAppSettings extends StatelessWidget {
             ),
           ),
           SettingHeader(title: 'Notifications'),
-          ExpansionTile(
-            title: Text(
-              'Notifications',
-              style: TextStyle(fontSize: 20, color: textColor),
+          Padding(
+            padding: EdgeInsetsGeometry.only(left: Screen.width(context) * .03),
+            child: ExpansionTile(
+              title: Text(
+                'Notifications',
+                style: TextStyle(fontSize: 20, color: textColor),
+              ),
+              trailing: Switch(
+                value: true,
+                onChanged: (bool value) {
+                  value = !value;
+                },
+              ),
+              children: [
+                ExpandedListTileSwitch(title: 'Release Dates'),
+                ExpandedListTileSwitch(title: 'Streak'),
+                ExpandedListTileSwitch(title: 'Announcements'),
+              ],
             ),
-            trailing: Switch(
-              value: true,
-              onChanged: (bool value) {
-                value = !value;
-              },
-            ),
-            children: [
-              ExpandedListTileSwitch(title: 'Release Dates'),
-              ExpandedListTileSwitch(title: 'Streak'),
-              ExpandedListTileSwitch(title: 'Announcements'),
-            ],
           ),
+
           SettingHeader(title: 'Parental Controls'),
           Material(
             color: scaffoldBg,
-            child: SizedBox(
-              height: 50,
-              child: ListTile(
-                title: Text(
-                  'Show NSFW Content',
-                  style: TextStyle(fontSize: 20, color: textColor),
+            child: Padding(
+              padding: EdgeInsetsGeometry.only(
+                left: Screen.width(context) * .03,
+              ),
+              child: SizedBox(
+                height: Screen.height(context) * .06,
+                child: ListTile(
+                  title: Text(
+                    'Show NSFW Content',
+                    style: TextStyle(fontSize: 20, color: textColor),
+                  ),
+                  trailing: Switch(value: true, onChanged: (value) {}),
                 ),
-                trailing: Switch(value: true, onChanged: (value) {}),
               ),
             ),
           ),
@@ -120,9 +140,16 @@ class ExpandedListTileSwitch extends StatelessWidget {
 
     return ListTile(
       tileColor: scaffoldBg,
-      leading: Container(width: 16, height: 2, color: theme.dividerColor),
+      leading: Container(
+        width: Screen.width(context) * .05,
+        height: Screen.height(context) * .002,
+        color: theme.dividerColor,
+      ),
       trailing: Switch(value: true, onChanged: (bool value) {}),
-      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+      contentPadding: EdgeInsets.symmetric(
+        horizontal: Screen.width(context) * .06,
+        vertical: 0,
+      ),
       title: Text(title, style: TextStyle(color: textColor)),
     );
   }
@@ -154,7 +181,7 @@ class ColorPickerTile extends StatelessWidget {
                 ? Icon(Icons.check, color: Colors.white)
                 : null,
           ),
-          SizedBox(width: 20),
+          SizedBox(width: Screen.width(context) * .05),
           Text(colorName, style: TextStyle(fontSize: 20, color: textColor)),
         ],
       ),
@@ -180,10 +207,13 @@ class ColorPicker extends StatelessWidget {
       Colors.indigo: "Indigo",
     };
     return Padding(
-      padding: EdgeInsets.only(left: 10, top: 10, bottom: 10),
+      padding: EdgeInsets.only(
+        left: Screen.width(context) * .02,
+        top: Screen.height(context) * .01,
+        bottom: Screen.height(context) * .01,
+      ),
       child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
+        runSpacing: Screen.height(context) * .015,
         children: [
           for (final color in colorNames.keys)
             ColorPickerTile(colorName: colorNames[color]!, color: color),
@@ -208,7 +238,10 @@ class SettingHeader extends StatelessWidget {
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
-            padding: EdgeInsets.only(left: 25, top: 25),
+            padding: EdgeInsets.only(
+              left: Screen.width(context) * .07,
+              top: Screen.height(context) * .03,
+            ),
             child: Text(
               title,
               style: TextStyle(fontSize: 40, color: textColor),
@@ -216,10 +249,10 @@ class SettingHeader extends StatelessWidget {
           ),
         ),
         Divider(
-          height: 30,
-          thickness: 3,
-          indent: 20,
-          endIndent: 20,
+          height: Screen.height(context) * .03,
+          thickness: Screen.height(context) * .003,
+          indent: Screen.width(context) * .05,
+          endIndent: Screen.width(context) * .05,
           color: theme.dividerColor,
         ),
       ],
