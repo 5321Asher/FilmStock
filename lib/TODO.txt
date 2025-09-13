@@ -1,5 +1,4 @@
-//TODO finish help and request page
-
 //TODO (HOLD)change font values to dynamic
 
+//TODO code Account Page
 temp clipboard

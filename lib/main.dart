@@ -1,7 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:filmstock/account_page.dart';
 import 'package:filmstock/app_settings.dart';
 import 'package:filmstock/help_and_feedback.dart';
+import 'package:filmstock/signin_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 ThemeData buildTheme(Color primary, Brightness brightness) {
   return ThemeData(
@@ -58,14 +64,49 @@ class Screen {
       MediaQuery.of(context).size.height;
 }
 
-void main() {
+Future<void> saveThemeAndColor(ThemeMode mode, Color color) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('themeMode', mode.name);
+  // ignore: deprecated_member_use
+  prefs.setInt('accentColor', color.value);
+}
+
+Future<void> loadThemeAndColor() async {
+  final prefs = await SharedPreferences.getInstance();
+  final themeStr = prefs.getString('themeMode');
+  final colorInt = prefs.getInt('accentColor');
+
+  if (themeStr != null) {
+    themeNotifier.value = ThemeMode.values.firstWhere(
+      (m) => m.name == themeStr,
+    );
+  }
+  if (colorInt != null) {
+    accentColorNotifier.value = Color(colorInt);
+  }
+}
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(
+    url: 'https://auubuwfbufxuvpudersk.supabase.co',
+    anonKey:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1dWJ1d2ZidWZ4dXZwdWRlcnNrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNDU2NjYsImV4cCI6MjA3MjcyMTY2Nn0.GREhTEKKFCue0dBgC7xm1ZVVg84SjjV1I4lAbuKlkdk',
+  );
+  await loadThemeAndColor();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
   runApp(MyApp());
 }
+
+final supabase = Supabase.instance.client;
+final session = supabase.auth.currentSession;
+
+final user = supabase.auth.currentUser;
+final userId = user?.id;
+final username = user?.userMetadata?['display_name'] ?? 'No Name';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -83,7 +124,7 @@ class MyApp extends StatelessWidget {
               theme: buildTheme(primary, Brightness.light),
               darkTheme: buildTheme(primary, Brightness.dark),
               themeMode: mode,
-              home: MyHomePage(title: 'home page'),
+              home: session == null ? SigninUp() : MyHomePage(),
             );
           },
         );
@@ -92,10 +133,21 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+extension ContextExtension on BuildContext {
+  void showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(
+        content: Center(child: Text(message)),
+        backgroundColor: isError
+            ? Theme.of(this).colorScheme.error
+            : Theme.of(this).snackBarTheme.backgroundColor,
+      ),
+    );
+  }
+}
 
-  final String title;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => MyHomePageState();
@@ -113,21 +165,8 @@ class MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Film Stock',
-          style: TextStyle(
-            color: theme.appBarTheme.titleTextStyle?.color ?? textColor,
-          ),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.search,
-              color: theme.appBarTheme.iconTheme?.color ?? textColor,
-            ),
-          ),
-        ],
+        title: Text('Film Stock'),
+        //actions: [IconButton(onPressed: () {}, icon: Icon(Icons.search))],
       ),
       drawer: Drawer(
         child: Column(
@@ -160,13 +199,20 @@ class MyHomePageState extends State<MyHomePage> {
                       color: scaffoldBg,
                       child: ListTile(
                         title: Text(
-                          '<user>',
+                          username,
                           style: TextStyle(fontSize: 30, color: textColor),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         leading: Icon(Icons.person, color: primary, size: 30),
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AccountPage(),
+                            ),
+                          );
+                        },
                       ),
                     ),
                     Material(
@@ -293,7 +339,17 @@ class MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                         leading: Icon(Icons.logout, color: colorScheme.error),
-                        onTap: () {},
+                        onTap: () async {
+                          await supabase.auth.signOut();
+                          if (mounted) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (context) => const SigninUp(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        },
                       ),
                     ),
                   ],
@@ -325,7 +381,7 @@ class MyHomePageState extends State<MyHomePage> {
           children: [
             Center(
               child: Text(
-                'Welcome <user>',
+                'Welcome $username',
                 style: TextStyle(
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
@@ -339,53 +395,83 @@ class MyHomePageState extends State<MyHomePage> {
               child: SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     HomePageHeader(title: 'Discover New Movies', onTap: () {}),
-                    Divider(
-                      height: 0,
-                      thickness: Screen.height(context) * .003,
-                      indent: Screen.width(context) * .25,
-                      endIndent: Screen.width(context) * .25,
-                      color: theme.dividerColor,
+
+                    Center(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            HomePageGenreCard(
+                              name: 'asher',
+                              color: Colors.red,
+                              onTap: () {},
+                            ),
+
+                            HomePageGenreCard(
+                              name: 'asher',
+                              color: Colors.red,
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    SizedBox(height: Screen.height(context) * .01),
-                    HomePageGenreCard(
-                      name: 'asher',
-                      color: Colors.red,
-                      onTap: () {},
-                    ),
+
                     HomePageHeader(title: 'Friend Activity', onTap: () {}),
-                    Divider(
-                      height: 0,
-                      thickness: Screen.height(context) * .003,
-                      indent: Screen.width(context) * .25,
-                      endIndent: Screen.width(context) * .25,
-                      color: theme.dividerColor,
-                    ),
-                    SizedBox(height: Screen.height(context) * .01),
-                    HomePageFriendCard(
-                      username: 'user',
-                      content: 'interstellar',
-                      rating: 9,
-                      comment: "great stuff",
-                      onTap: () {},
+
+                    Center(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            HomePageFriendCard(
+                              username: 'user',
+                              content: 'interstellar',
+                              rating: 9,
+                              comment: "great stuff",
+                              onTap: () {},
+                            ),
+                            HomePageFriendCard(
+                              username: 'user',
+                              content: 'interstellar',
+                              rating: 9,
+                              comment: "great stuff",
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                     HomePageHeader(title: 'Your Recent Activity', onTap: () {}),
-                    Divider(
-                      height: 0,
-                      thickness: Screen.height(context) * .003,
-                      indent: Screen.width(context) * .25,
-                      endIndent: Screen.width(context) * .25,
-                      color: theme.dividerColor,
-                    ),
-                    SizedBox(height: Screen.height(context) * .01),
 
-                    HomePageRecentActivity(
-                      content: 'interstellar',
-                      rating: 9.5,
-                      comment: 'fantastic stuf',
-                      onTap: () {},
+                    Center(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            HomePageRecentActivity(
+                              content: 'interstellar',
+                              rating: 9.5,
+                              comment: 'fantastic stuf',
+                              onTap: () {},
+                            ),
+                            HomePageRecentActivity(
+                              content: 'interstellar',
+                              rating: 9.5,
+                              comment: 'fantastic stuf',
+                              onTap: () {},
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
+
                     SizedBox(height: Screen.height(context) * .1),
                   ],
                 ),
@@ -416,13 +502,17 @@ class HomePageHeader extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Center(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
+                Padding(
+                  padding: EdgeInsets.only(left: Screen.width(context) * .05),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
                     ),
                   ),
                 ),
@@ -438,6 +528,15 @@ class HomePageHeader extends StatelessWidget {
                 ),
               ],
             ),
+            SizedBox(height: Screen.height(context) * .01),
+            Divider(
+              height: 0,
+              thickness: Screen.height(context) * .003,
+              indent: Screen.width(context) * .03,
+              endIndent: Screen.width(context) * .3,
+              color: theme.dividerColor,
+            ),
+            SizedBox(height: Screen.height(context) * .01),
           ],
         ),
       ),
@@ -461,26 +560,29 @@ class HomePageGenreCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
-    return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Screen.width(context) * .01),
+      child: Material(
+        color: color,
         borderRadius: BorderRadius.circular(8),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          width: Screen.width(context) * .35,
-          height: Screen.height(context) * .25,
-          child: Center(
-            child: Text(
-              name,
-              style: TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            width: Screen.width(context) * .35,
+            height: Screen.height(context) * .25,
+            child: Center(
+              child: Text(
+                name,
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
           ),
@@ -512,81 +614,84 @@ class HomePageFriendCard extends StatelessWidget {
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
     final primary = theme.colorScheme.primary;
     final cardColor = theme.cardColor;
-    return Material(
-      color: cardColor,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Screen.width(context) * .01),
+      child: Material(
+        color: cardColor,
         borderRadius: BorderRadius.circular(8),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: primary),
-          ),
-          width: Screen.width(context) * .4,
-          height: Screen.height(context) * .2,
-          padding: EdgeInsets.all(8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: primary),
+            ),
+            width: Screen.width(context) * .4,
+            height: Screen.height(context) * .2,
+            padding: EdgeInsets.all(8),
 
-          child: Column(
-            children: [
-              Center(
-                child: Text(
-                  username,
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+            child: Column(
+              children: [
+                Center(
+                  child: Text(
+                    username,
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              SizedBox(height: 6),
-              Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: EdgeInsets.only(right: 48),
+                SizedBox(height: 6),
+                Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        padding: EdgeInsets.only(right: 48),
+                        child: Text(
+                          content,
+                          style: TextStyle(color: textColor, fontSize: 16),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
                       child: Text(
-                        content,
-                        style: TextStyle(color: textColor, fontSize: 16),
+                        '$rating/10',
+                        style: TextStyle(color: textColor, fontSize: 14),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: Text(
-                      '$rating/10',
-                      style: TextStyle(color: textColor, fontSize: 14),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              Divider(
-                height: 6,
-                thickness: 1,
-                indent: 0,
-                endIndent: 0,
-                color: primary,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  comment,
-                  style: TextStyle(color: textColor, fontSize: 14),
-                  maxLines: 5,
-                  overflow: TextOverflow.ellipsis,
+                  ],
                 ),
-              ),
-            ],
+                Divider(
+                  height: 6,
+                  thickness: 1,
+                  indent: 0,
+                  endIndent: 0,
+                  color: primary,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    comment,
+                    style: TextStyle(color: textColor, fontSize: 14),
+                    maxLines: 5,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -614,66 +719,69 @@ class HomePageRecentActivity extends StatelessWidget {
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
     final primary = theme.colorScheme.primary;
     final cardColor = theme.cardColor;
-    return Material(
-      color: cardColor,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Screen.width(context) * .01),
+      child: Material(
+        color: cardColor,
         borderRadius: BorderRadius.circular(8),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: cardColor,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: primary),
-          ),
-          width: Screen.width(context) * .4,
-          height: Screen.height(context) * .15,
-          padding: EdgeInsets.all(8),
-          child: Column(
-            children: [
-              Center(
-                child: Text(
-                  content,
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              SizedBox(height: 6),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: EdgeInsets.only(right: 48),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Ink(
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: primary),
+            ),
+            width: Screen.width(context) * .4,
+            height: Screen.height(context) * .15,
+            padding: EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Center(
                   child: Text(
-                    '$rating/10',
-                    style: TextStyle(color: textColor, fontSize: 16),
+                    content,
+                    style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-              ),
-
-              Divider(
-                height: 6,
-                thickness: 1,
-                indent: 0,
-                endIndent: 0,
-                color: primary,
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  comment,
-                  style: TextStyle(color: textColor, fontSize: 14),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                SizedBox(height: 6),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    padding: EdgeInsets.only(right: 48),
+                    child: Text(
+                      '$rating/10',
+                      style: TextStyle(color: textColor, fontSize: 16),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+
+                Divider(
+                  height: 6,
+                  thickness: 1,
+                  indent: 0,
+                  endIndent: 0,
+                  color: primary,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    comment,
+                    style: TextStyle(color: textColor, fontSize: 14),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -35,6 +35,10 @@ class MyAppSettings extends StatelessWidget {
                       themeNotifier.value = value
                           ? ThemeMode.dark
                           : ThemeMode.light;
+                      saveThemeAndColor(
+                        themeNotifier.value,
+                        accentColorNotifier.value,
+                      );
                     },
                   ),
                 ),
@@ -171,7 +175,10 @@ class ColorPickerTile extends StatelessWidget {
     final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
 
     return GestureDetector(
-      onTap: () => accentColorNotifier.value = color,
+      onTap: () {
+        accentColorNotifier.value = color;
+        saveThemeAndColor(themeNotifier.value, accentColorNotifier.value);
+      },
       child: Row(
         children: [
           CircleAvatar(
