@@ -21,41 +21,6 @@ class LoginPageState extends State<SignupPage> {
   late final TextEditingController nameController = TextEditingController();
   late final StreamSubscription<AuthState> authStateSubscription;
 
-  Future<void> signin() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      await supabase.auth.signInWithOtp(
-        email: emailController.text.trim(),
-        emailRedirectTo: kIsWeb
-            ? null
-            : 'io.supabase.flutterquickstart://login-callback/',
-      );
-
-      if (mounted) {
-        context.showSnackBar('check your email for a login link');
-
-        pendName = nameController.text.trim();
-
-        emailController.clear();
-        nameController.clear();
-      }
-    } on AuthException catch (error) {
-      if (mounted) context.showSnackBar(error.message, isError: true);
-    } catch (error) {
-      if (mounted) {
-        context.showSnackBar('Unexpected Error Occured', isError: true);
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
-  }
-
   @override
   void initState() {
     authStateSubscription = supabase.auth.onAuthStateChange.listen(
@@ -63,15 +28,27 @@ class LoginPageState extends State<SignupPage> {
         if (redirecting) return;
         final session = data.session;
         if (session != null) {
-          redirecting = true;
-
-          if (username == null) {
-            if (pendName != null && pendName!.isNotEmpty) {
-              await supabase.auth.updateUser(
-                UserAttributes(data: {'display_name': pendName}),
-              );
+          if (pendName != null) {
+            try {
+              await supabase.from('profiles').insert({
+                'user_id': session.user.id,
+                'username': pendName,
+              });
+              pendName = null; 
+            } catch (error) {
+     
+              if (mounted) {
+                context.showSnackBar(
+                  'Error saving username: ${error.toString()}',
+                  isError: true,
+                );
+              }
+       
+              return;
             }
           }
+
+          redirecting = true;
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => MyHomePage()),
           );
@@ -81,11 +58,73 @@ class LoginPageState extends State<SignupPage> {
         if (error is AuthException) {
           context.showSnackBar(error.message, isError: true);
         } else {
-          context.showSnackBar('Unexpected Error Occured');
+          context.showSnackBar('Unexpected Error Occurred');
         }
       },
     );
     super.initState();
+  }
+
+  Future<void> signin() async {
+    final enteredName = nameController.text.trim();
+    if (enteredName.isEmpty) {
+      context.showSnackBar('Please enter a username', isError: true);
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+   
+      final response = await supabase
+          .from('profiles') 
+          .select('username')
+          .eq('username', enteredName);
+
+      final usernames = response as List;
+      if (usernames.isNotEmpty) {
+        context.showSnackBar('Username Taken', isError: true);
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Send magic link
+      await supabase.auth.signInWithOtp(
+        email: emailController.text.trim(),
+        emailRedirectTo: kIsWeb
+            ? null
+            : 'io.supabase.flutterquickstart://login-callback/',
+      );
+
+  
+
+      if (mounted) {
+        context.showSnackBar('Check your email for a login link');
+        emailController.clear();
+        nameController.clear();
+     
+        pendName = enteredName;
+      }
+    } on AuthException catch (error) {
+      if (mounted) context.showSnackBar(error.message, isError: true);
+    } catch (error) {
+      if (mounted) {
+        context.showSnackBar(
+          'Unexpected Error Occurred: ${error.toString()}',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override

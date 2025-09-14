@@ -104,9 +104,27 @@ Future<void> main() async {
 final supabase = Supabase.instance.client;
 final session = supabase.auth.currentSession;
 
-final user = supabase.auth.currentUser;
-final userId = user?.id;
-final username = user?.userMetadata?['display_name'] ?? 'No Name';
+class user {
+  static final current = supabase.auth.currentUser;
+  static final id = supabase.auth.currentUser?.id;
+}
+
+Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+  try {
+    if (user.current == null) {
+      return null;
+    }
+    final response = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user!.id)
+        .single();
+    return response;
+  } catch (e) {
+    print('$e');
+    return null;
+  }
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
