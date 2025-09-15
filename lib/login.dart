@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:filmstock/main.dart';
+import 'package:filmstock/current_user.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -60,8 +61,22 @@ class LoginPageState extends State<LoginPage> {
         if (session != null) {
           redirecting = true;
 
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => MyHomePage()),
+         Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) {
+                return FutureBuilder(
+                  future: Currentuser.instance.loadUserInfo(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return MyHomePage();
+                    }
+                    return Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  },
+                );
+              },
+            ),
           );
         }
       },

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:filmstock/current_user.dart';
 
 ThemeData buildTheme(Color primary, Brightness brightness) {
   return ThemeData(
@@ -98,33 +99,16 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  await Currentuser.instance.loadUserInfo();
   runApp(MyApp());
 }
 
 final supabase = Supabase.instance.client;
 final session = supabase.auth.currentSession;
 
-class user {
-  static final current = supabase.auth.currentUser;
-  static final id = supabase.auth.currentUser?.id;
-}
-
-Future<Map<String, dynamic>?> getCurrentUserProfile() async {
-  try {
-    if (user.current == null) {
-      return null;
-    }
-    final response = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user!.id)
-        .single();
-    return response;
-  } catch (e) {
-    print('$e');
-    return null;
-  }
-}
+String? get userId => Currentuser.instance.id;
+String? get userEmail => Currentuser.instance.email;
+String? get username => Currentuser.instance.username;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -217,7 +201,7 @@ class MyHomePageState extends State<MyHomePage> {
                       color: scaffoldBg,
                       child: ListTile(
                         title: Text(
-                          username,
+                          username ?? '',
                           style: TextStyle(fontSize: 30, color: textColor),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -399,7 +383,7 @@ class MyHomePageState extends State<MyHomePage> {
           children: [
             Center(
               child: Text(
-                'Welcome $username',
+                'Welcome $username ',
                 style: TextStyle(
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
