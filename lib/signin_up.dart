@@ -28,7 +28,7 @@ class SigninUpState extends State<SigninUp> {
 // Refactor LoginPageState and SignupPageState to stateless widgets that accept onSwitch callback
 class LoginPage extends StatefulWidget {
   final VoidCallback onSwitch;
-  const LoginPage({required this.onSwitch, Key? key}) : super(key: key);
+  const LoginPage({required this.onSwitch, super.key});
 
   @override
   State<LoginPage> createState() => LoginPageState();

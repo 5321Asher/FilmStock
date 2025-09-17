@@ -100,6 +100,11 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
   await Currentuser.instance.loadUserInfo();
+  // print('username: $username');
+  // print('id: $userId');
+  // print('email: $userEmail');
+  // print('created_at: $userCreatedAt');
+  // print('bio: $userBio');
   runApp(MyApp());
 }
 
@@ -109,6 +114,8 @@ final session = supabase.auth.currentSession;
 String? get userId => Currentuser.instance.id;
 String? get userEmail => Currentuser.instance.email;
 String? get username => Currentuser.instance.username;
+String? get userBio => Currentuser.instance.bio;
+DateTime? get userCreatedAt => Currentuser.instance.created_at;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -382,15 +389,20 @@ class MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             Center(
-              child: Text(
-                'Welcome $username ',
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: Screen.width(context) * .05,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                child: Text(
+                  'Welcome $username ',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
             Expanded(
