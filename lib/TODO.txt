@@ -1,3 +1,14 @@
 //TODO change font values to dynamic
-//TODO code Account Page
+//TODO change email address
+
 temp clipboard
+
+############### theme
+final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final scaffoldBg = theme.scaffoldBackgroundColor;
+    final textColor = theme.textTheme.titleMedium?.color ?? Colors.black;
+    final primary = colorScheme.primary;
+
+############### provider
+  final user = Provider.of<Currentuser>(context);

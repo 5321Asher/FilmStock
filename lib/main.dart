@@ -6,6 +6,7 @@ import 'package:filmstock/help_and_feedback.dart';
 import 'package:filmstock/signin_up.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:filmstock/current_user.dart';
@@ -101,11 +102,13 @@ Future<void> main() async {
   ]);
   await Currentuser.instance.loadUserInfo();
   // print('username: $username');
-  // print('id: $userId');
+  //print('id: $userId');
   // print('email: $userEmail');
   // print('created_at: $userCreatedAt');
   // print('bio: $userBio');
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider.value(value: Currentuser.instance, child: MyApp()),
+  );
 }
 
 final supabase = Supabase.instance.client;
@@ -165,6 +168,7 @@ class MyHomePage extends StatefulWidget {
 class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<Currentuser>(context);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final scaffoldBg = theme.scaffoldBackgroundColor;
@@ -208,7 +212,7 @@ class MyHomePageState extends State<MyHomePage> {
                       color: scaffoldBg,
                       child: ListTile(
                         title: Text(
-                          username ?? '',
+                          user.username ?? 'username',
                           style: TextStyle(fontSize: 30, color: textColor),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -394,7 +398,7 @@ class MyHomePageState extends State<MyHomePage> {
                   horizontal: Screen.width(context) * .05,
                 ),
                 child: Text(
-                  'Welcome $username ',
+                  'Welcome ${user.username}',
                   style: TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,

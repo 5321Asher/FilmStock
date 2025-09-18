@@ -8,6 +8,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 class SigninUp extends StatefulWidget {
+
+
   const SigninUp({super.key});
 
   @override
@@ -245,7 +247,7 @@ class LoginPageState extends State<LoginPage> {
 
 class SignupPage extends StatefulWidget {
   final VoidCallback onSwitch;
-  const SignupPage({required this.onSwitch, Key? key}) : super(key: key);
+  const SignupPage({required this.onSwitch, super.key});
 
   @override
   State<SignupPage> createState() => SignupPageState();
